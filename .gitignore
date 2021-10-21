@@ -67,4 +67,7 @@ doc/generated/
 target/
 
 #Test data
-kddcup.data.corrected
+kddcup.data_10_percent
+
+#vscode
+.vscode/

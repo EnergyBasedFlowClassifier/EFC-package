@@ -85,7 +85,7 @@ copyright = u'2016, Vighnesh Birodkar'
 # built documents.
 #
 # The short X.Y version.
-from efctemplate import __version__
+from efc import __version__
 version = __version__
 # The full version, including alpha/beta/rc tags.
 release = __version__
@@ -309,12 +309,12 @@ intersphinx_mapping = {
 
 # sphinx-gallery configuration
 sphinx_gallery_conf = {
-    'doc_module': 'efctemplate',
+    'doc_module': 'efc',
     'backreferences_dir': os.path.join('generated'),
     'reference_url': {
-        'efctemplate': None}
+        'efc': None}
 }
 
 def setup(app):
     # a copy button to copy snippet of code from the documentation
-    app.add_javascript('js/copybutton.js')
+    app.add_js_file('js/copybutton.js')
