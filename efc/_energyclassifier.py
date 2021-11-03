@@ -6,8 +6,9 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from joblib import Parallel, delayed
 from pandas.api.types import is_numeric_dtype
-
-
+from efc._energyclassifier_fast import coupling, local_fields, pair_freq
+import sys
+sys.path.insert(0, '/home/munak98/Documents/project-template')
 class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
     """ The Energy-based Flow Classifier algorithm.
 
@@ -155,7 +156,6 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
 
 class BaseEFC(ClassifierMixin, BaseEstimator):
     """ The Base estimator used by the Energy-based Flow Classifier.
-    Used to model only one class.
 
     Parameters
     ----------
@@ -174,7 +174,7 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
     sitefreq_ : ndarray, shape (n_feature, max_bin)
       Observed frequency of attribute values ​​in each attribute.
 
-    pairfreq_ : ndarray, shape (n_feature, max_bin, n_feature, max_bin)
+    __ : ndarray, shape (n_feature, max_bin, n_feature, max_bin)
         Observed frequency of attribute value pairs in attribute pairs.
 
     coupling_matrix_ : ndarray, shape (n_feature*max_bin, n_feature*max_bin)
@@ -207,14 +207,13 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
 
     def fit(self, X):
         self.X_ = X
-        self._site_freq()
-        self._pair_freq()
-        self._coupling()
-        self._local_fields()
+        self.sitefreq_ = self._site_freq()
+        self.pairfreq_ = self._pair_freq()
+        self.coupling_matrix_ = self._coupling()
+        self.local_fields_ = self._local_fields()
         self.coupling_matrix_ = np.log(self.coupling_matrix_)
         self.local_fields_ = np.log(self.local_fields_)
-        self._define_cutoff()
-
+        self.cutoff_ = self._define_cutoff()
         return self
 
     def _site_freq(self):
@@ -228,68 +227,68 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
         sitefreq = ((1 - self.pseudocounts) * sitefreq
                     + self.pseudocounts / self.max_bin)
 
-        self.sitefreq_ = sitefreq
-        return
+        return sitefreq
 
     def _pair_freq(self):
-        n_attr = self.X_.shape[1]
-        pairfreq = np.zeros((n_attr, self.max_bin, n_attr, self.max_bin),
-                            dtype='float')
+        # n_attr = self.X_.shape[1]
+        # pairfreq = np.zeros((n_attr, self.max_bin, n_attr, self.max_bin),
+        #                     dtype='float')
 
-        for i in range(n_attr):
-            for j in range(n_attr):
-                unique, counts = np.unique(self.X_[:, [i, j]],
-                                           return_counts=True, axis=0)
-                for (pair, count) in zip(unique, counts):
-                    pairfreq[i, pair[0], j, pair[1]] = count
+        # for i in range(n_attr):
+        #     for j in range(n_attr):
+        #         unique, counts = np.unique(self.X_[:, [i, j]],
+        #                                    return_counts=True, axis=0)
+        #         for (pair, count) in zip(unique, counts):
+        #             pairfreq[i, pair[0], j, pair[1]] = count
 
-        pairfreq /= self.X_.shape[0]
-        pairfreq = ((1 - self.pseudocounts) * pairfreq
-                    + self.pseudocounts / (self.max_bin**2))
+        # pairfreq /= self.X_.shape[0]
+        # pairfreq = ((1 - self.pseudocounts) * pairfreq
+        #             + self.pseudocounts / (self.max_bin**2))
 
-        for i in range(n_attr):
-            for ai in range(self.max_bin):
-                for aj in range(self.max_bin):
-                    if (ai == aj):
-                        pairfreq[i, ai, i, aj] = self.sitefreq_[i, ai]
-                    else:
-                        pairfreq[i, ai, i, aj] = 0.0
+        # for i in range(n_attr):
+        #     for ai in range(self.max_bin):
+        #         for aj in range(self.max_bin):
+        #             if (ai == aj):
+        #                 pairfreq[i, ai, i, aj] = self.sitefreq_[i, ai]
+        #             else:
+        #                 pairfreq[i, ai, i, aj] = 0.0
 
-        self.pairfreq_ = pairfreq
-        return
+        
+        # return pairfreq
+        return pair_freq(self)
 
     def _coupling(self):
-        n_attr = self.sitefreq_.shape[0]
-        corr_matrix = np.empty((n_attr * (self.max_bin - 1),
-                                n_attr * (self.max_bin - 1)), dtype='float')
-        for i in range(n_attr):
-            for j in range(n_attr):
-                for ai in range(self.max_bin - 1):
-                    for aj in range(self.max_bin - 1):
-                        corr_matrix[i * (self.max_bin - 1) + ai,
-                                    j * (self.max_bin - 1) + aj] = (self.pairfreq_[i, ai, j, aj]
-                                                                    - self.sitefreq_[i, ai]
-                                                                    * self.sitefreq_[j, aj])
+        # n_attr = self.sitefreq_.shape[0]
+        # corr_matrix = np.empty((n_attr * (self.max_bin - 1),
+        #                         n_attr * (self.max_bin - 1)), dtype='float')
+        # for i in range(n_attr):
+        #     for j in range(n_attr):
+        #         for ai in range(self.max_bin - 1):
+        #             for aj in range(self.max_bin - 1):
+        #                 corr_matrix[i * (self.max_bin - 1) + ai,
+        #                             j * (self.max_bin - 1) + aj] = (self.pairfreq_[i, ai, j, aj]
+        #                                                             - self.sitefreq_[i, ai]
+        #                                                             * self.sitefreq_[j, aj])
 
-        inv_corr = np.linalg.inv(corr_matrix)
-        self.coupling_matrix_ = np.exp(np.negative(inv_corr))
-        return
+        # inv_corr = np.linalg.inv(corr_matrix)
+        # self.coupling_matrix_ = np.exp(np.negative(inv_corr))
+        return coupling(self)
 
     def _local_fields(self):
-        n_inst = self.sitefreq_.shape[0]
-        fields = np.empty((n_inst * (self.max_bin - 1)), dtype='double')
+        # n_inst = self.sitefreq_.shape[0]
+        # fields = np.empty((n_inst * (self.max_bin - 1)), dtype='double')
 
-        for i in range(n_inst):
-            for ai in range(self.max_bin - 1):
-                fields[i * (self.max_bin - 1) + ai] = (self.sitefreq_[i, ai]
-                                                       / self.sitefreq_[i, self.max_bin - 1])
-                for j in range(n_inst):
-                    for aj in range(self.max_bin - 1):
-                        fields[i * (self.max_bin - 1) + ai] /= (
-                            self.coupling_matrix_[i * (self.max_bin - 1) + ai, j * (self.max_bin - 1) + aj]**self.sitefreq_[j, aj])
+        # for i in range(n_inst):
+        #     for ai in range(self.max_bin - 1):
+        #         fields[i * (self.max_bin - 1) + ai] = (self.sitefreq_[i, ai]
+        #                                                / self.sitefreq_[i, self.max_bin - 1])
+        #         for j in range(n_inst):
+        #             for aj in range(self.max_bin - 1):
+        #                 fields[i * (self.max_bin - 1) + ai] /= (
+        #                     self.coupling_matrix_[i * (self.max_bin - 1) + ai, j * (self.max_bin - 1) + aj]**self.sitefreq_[j, aj])
 
-        self.local_fields_ = fields
-        return
+        # self.local_fields_ = fields
+        return local_fields(self)
 
     def _compute_energy(self, X):
         n_inst, n_attr = X.shape[0], X.shape[1]
@@ -311,5 +310,4 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
     def _define_cutoff(self):
         energies = self._compute_energy(self.X_)
         energies = np.sort(energies, axis=None)
-        self.cutoff_ = energies[int(energies.shape[0] * self.cutoff_quantile)]
-        return
+        return energies[int(energies.shape[0] * self.cutoff_quantile)]

@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder, MaxAbsScaler, KBinsDiscretizer, LabelEncoder
 import sys
 sys.path.insert(0, '/home/munak98/Documents/project-template')
-from efc import EnergyBasedFlowClassifier
+from efc import EnergyBasedFlowClassifier, BaseEFC
 
 
 X, y = load_breast_cancer(return_X_y=True)

@@ -71,3 +71,11 @@ kddcup.data_10_percent
 
 #vscode
 .vscode/
+
+#notebook
+.ipynb*
+optmaization*
+
+#cython
+*.c 
+*.html

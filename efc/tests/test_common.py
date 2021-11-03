@@ -4,7 +4,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 import sys
 sys.path.insert(0, '/home/munak98/Documents/project-template')
-from efc import EnergyBasedFlowClassifier
+from efc._energyclassifier import EnergyBasedFlowClassifier
 
 
 
