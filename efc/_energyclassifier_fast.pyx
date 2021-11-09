@@ -6,9 +6,19 @@ cimport cython
 # cython: binding=True
 # distutils: define_macros=CYTHON_TRACE_NOGIL=1
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef cantor(long [:] x, long [:] y):
+    output = np.empty(x.shape[0], dtype='float')
+    cdef double [:] output_view = output
+    cdef int i 
+    for i in range(x.shape[0]):
+        output_view[i] = (x[i] + y[i]) * (x[i] + y[i] + 1) / 2 + y[i]
+    return output
+
 # @cython.cdivision(True)
 def pair_freq(self):
-    cdef int i, j, count, ai, aj
+    cdef int i, j, count, ai, aj, item, x
     cdef float psdcounts = self.pseudocounts
     cdef int max_bin = self.max_bin
     cdef int n_inst = self.X_.shape[0]
@@ -17,32 +27,31 @@ def pair_freq(self):
     pairfreq = np.zeros((n_attr, max_bin, n_attr, max_bin),
                         dtype='float')
 
+    cdef long [:, :] X_view = self.X_
     cdef double [:, :, :, :] pairfreq_view = pairfreq
     cdef double [:, :] sitefreq_view = self.sitefreq_
 
     for i in range(n_attr):
         for j in range(n_attr):
-            unique, counts = np.unique(self.X_[:, [i, j]],
-                                        return_counts=True, axis=0)
-            for (pair, count) in zip(unique, counts):
-                pairfreq_view[i, pair[0], j, pair[1]] = count 
+            c = cantor(X_view[:,i],X_view[:,j])
+            unique,aaIdx = np.unique(c,True)
+            for x, item in enumerate(unique):
+                pairfreq_view[i, X_view[aaIdx[x],i],j,X_view[aaIdx[x],j]] = np.sum(np.equal(c,item))
 
     pairfreq /= n_inst
-    pairfreq = ((1 - psdcounts) * pairfreq
-                + psdcounts / (max_bin**2))
+    pairfreq = (1-psdcounts)*pairfreq + psdcounts/(max_bin**2)
 
     cdef double [:, :, :, :] pairfreq_new_view = pairfreq
+
 
     for i in range(n_attr):
         for ai in range(max_bin):
             for aj in range(max_bin):
-                if (ai == aj):
-                    pairfreq_new_view[i, ai, i, aj] = sitefreq_view[i, ai]
+                if (ai==aj):
+                    pairfreq_new_view[i,ai,i,aj] = sitefreq_view[i,ai]
                 else:
-                    pairfreq_new_view[i, ai, i, aj] = 0.0
-    
+                    pairfreq_new_view[i,ai,i,aj] = 0.0
     return pairfreq
-
 
 
 def coupling(self):
