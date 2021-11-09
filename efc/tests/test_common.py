@@ -17,7 +17,7 @@ def test_all_estimators(estimator):
 
 
 for idx, (estimator, func) in enumerate(test_all_estimators(EnergyBasedFlowClassifier())):
-    if idx != 20:
+    if idx not in [20]:
         print(idx)
         print(func)
         func(estimator)

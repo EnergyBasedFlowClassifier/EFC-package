@@ -73,8 +73,8 @@ kddcup.data_10_percent
 .vscode/
 
 #notebook
-.ipynb*
-optmaization*
+.ipynb
+*.ipynb
 
 #cython
 *.c 
