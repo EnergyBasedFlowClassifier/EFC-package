@@ -1,4 +1,4 @@
-name: project-template
+name: efc
 dependencies:
   - numpy
   - scipy

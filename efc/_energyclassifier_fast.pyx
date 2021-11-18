@@ -9,7 +9,7 @@ cimport cython
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef cantor(long [:] x, long [:] y):
-    output = np.empty(x.shape[0], dtype='float')
+    output = np.empty(x.shape[0], dtype='double')
     cdef double [:] output_view = output
     cdef int i 
     for i in range(x.shape[0]):
@@ -17,19 +17,18 @@ cdef cantor(long [:] x, long [:] y):
     return output
 
 # @cython.cdivision(True)
-def pair_freq(self):
+def pair_freq(long [:, :] X_view,
+            double [:, :] sitefreq_view,
+            double psdcounts,
+            int max_bin):
     cdef int i, j, count, ai, aj, item, x
-    cdef float psdcounts = self.pseudocounts
-    cdef int max_bin = self.max_bin
-    cdef int n_inst = self.X_.shape[0]
-    cdef int n_attr = self.X_.shape[1]
+    cdef int n_inst = X_view.shape[0]
+    cdef int n_attr = X_view.shape[1]
 
     pairfreq = np.zeros((n_attr, max_bin, n_attr, max_bin),
-                        dtype='float')
+                        dtype='double')
 
-    cdef long [:, :] X_view = self.X_
     cdef double [:, :, :, :] pairfreq_view = pairfreq
-    cdef double [:, :] sitefreq_view = self.sitefreq_
 
     for i in range(n_attr):
         for j in range(n_attr):
@@ -54,16 +53,17 @@ def pair_freq(self):
     return pairfreq
 
 
-def coupling(self):
+def coupling(double [:, :, :, :] pairfreq_view,
+            double [:, :] sitefreq_view, 
+            double psdcounts, 
+            int max_bin):
     cdef int i, j, ai, aj
-    cdef int n_attr = self.sitefreq_.shape[0]
-    cdef int max_bin = self.max_bin
+    cdef int n_attr = sitefreq_view.shape[0]
     corr_matrix = np.empty((n_attr * (max_bin - 1),
-                            n_attr * (max_bin - 1)), dtype='float')
+                            n_attr * (max_bin - 1)), dtype='double')
 
     cdef double [:, :] corr_matrix_view = corr_matrix
-    cdef double [:, :] sitefreq_view = self.sitefreq_
-    cdef double [:, :, :, :] pairfreq_view = self.pairfreq_
+
 
     for i in range(n_attr):
         for j in range(n_attr):
@@ -78,17 +78,15 @@ def coupling(self):
     return np.exp(np.negative(inv_corr))
 
 
-def local_fields(self):
+def local_fields(double [:, :] coupling_view, 
+                double [:, :, :, :] pairfreq_view, 
+                double [:, :] sitefreq_view, 
+                double psdcounts, 
+                int max_bin):
     cdef int i, ai, j, aj
-    cdef int n_inst = self.sitefreq_.shape[0]
-    cdef int max_bin = self.max_bin
-
-    fields = np.empty((n_inst * (max_bin - 1)), dtype='double')
-
+    cdef int n_inst = sitefreq_view.shape[0]
+    fields = np.zeros((n_inst * (max_bin - 1)), dtype='double')
     cdef double [:] fields_view = fields
-    cdef double [:, :] sitefreq_view = self.sitefreq_
-    cdef double [:, :, :, :] pairfreq_view = self.pairfreq_
-    cdef double [:, :] coupling_view = self.coupling_matrix_
 
     for i in range(n_inst):
         for ai in range(max_bin - 1):
@@ -96,7 +94,7 @@ def local_fields(self):
                                                     / sitefreq_view[i, max_bin - 1])
             for j in range(n_inst):
                 for aj in range(max_bin - 1):
-                    fields_view[i * (max_bin - 1) + ai] /= (
+                    fields_view[i * (max_bin - 1) + ai] = fields_view[i *       (max_bin - 1) + ai] / (
                         coupling_view[i * (max_bin - 1) + ai, j * (max_bin - 1) + aj]**sitefreq_view[j, aj])
 
     return fields
@@ -109,7 +107,7 @@ def compute_energy(self, X):
     cdef double e
     cdef int max_bin = self.max_bin
 
-    energies = np.empty(n_inst, dtype='float64')
+    energies = np.empty(n_inst, dtype='double')
 
     cdef long [:, :] X_view = X
     cdef double [:] energies_view = energies

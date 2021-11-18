@@ -11,7 +11,7 @@ from pandas.api.types import is_numeric_dtype
 from sklearn.metrics import classification_report
 from sklearn.datasets import *
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OrdinalEncoder, MaxAbsScaler, KBinsDiscretizer, LabelEncoder
+from sklearn.preprocessing import OrdinalEncoder, MaxAbsScaler, KBinsDiscretizer
 from matplotlib import pyplot as plt
 import sys
 sys.path.insert(0, '/home/munak98/Documents/project-template')
@@ -58,7 +58,7 @@ X_train[:, continuous] = norm.fit_transform(X_train[:, continuous])
 X_test[:, continuous] = norm.transform(X_test[:, continuous])
 
 #discretize continuos features
-disc = KBinsDiscretizer(n_bins=30, encode='ordinal', strategy='quantile')
+disc = KBinsDiscretizer(n_bins=20, encode='ordinal', strategy='uniform')
 X_train[:, continuous] = disc.fit_transform(X_train[:, continuous])
 X_test[:, continuous] = disc.transform(X_test[:, continuous]).astype('int64')
 
