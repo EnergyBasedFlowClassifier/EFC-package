@@ -1,18 +1,16 @@
 import numpy as np
-import warnings
 
 from seaborn import load_dataset
 from matplotlib import pyplot as plt
-from pandas.api.types import is_numeric_dtype
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.preprocessing import KBinsDiscretizer
 from efc import EnergyBasedFlowClassifier
 
 #load dataset
 data = load_dataset("titanic")
+data.columns = range(data.shape[1])
+
 data.replace([np.inf, -np.inf], np.nan)
 data.dropna(inplace=True)
 
@@ -22,41 +20,20 @@ y = data.iloc[:, 0]
 # split dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, stratify=y)
 
-#find symbolic and continous features indexes
-symbolic, continuous = [], []
-for i in range(X_train.shape[1]):
-    if is_numeric_dtype(X_train.iloc[:, i]):
-        continuous.append(i)
-    else:
-        symbolic.append(i)
-    
-X_train = np.array(X_train)
-y_train = np.array(y_train)
-X_test = np.array(X_test)
-y_test = np.array(y_test)
 
-#encode symbolic features
-if symbolic != []:
+#encode categorical features
+categorical = X_train.select_dtypes(exclude=np.number).columns.values
+if categorical.size != 0:
     enc = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=np.nan)
-    X_train[:, symbolic] = enc.fit_transform(X_train[:, symbolic])
-    X_test[:, symbolic] = enc.transform(X_test[:, symbolic])
-    X_test[:, symbolic] = np.nan_to_num(X_test[:, symbolic].astype('float'), nan=np.max(X_test[:, symbolic])+1)
+    X_train.loc[:, categorical] = enc.fit_transform(X_train.loc[:, categorical])
+    X_test.loc[:, categorical] = enc.transform(X_test.loc[:, categorical])
+    X_test.loc[:, categorical] = np.nan_to_num(X_test.loc[:, categorical].astype('float'), nan=np.max(X_test.loc[:, categorical])+1)
 
-#normalize continuos features
-norm = MaxAbsScaler()
-X_train[:, continuous] = norm.fit_transform(X_train[:, continuous])
-X_test[:, continuous] = norm.transform(X_test[:, continuous])
-
-#discretize continuos features
-disc = KBinsDiscretizer(n_bins=30, encode='ordinal', strategy='quantile')
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=UserWarning)
-    X_train[:, continuous] = disc.fit_transform(X_train[:, continuous])
-    X_test[:, continuous] = disc.transform(X_test[:, continuous]).astype('int64')
+categorical = [x-1 for x in categorical]
 
 #train and test EFC
 cls = EnergyBasedFlowClassifier(cutoff_quantile=0.99)
-cls.fit(X_train, y_train, base_class=1)
+cls.fit(X_train, y_train, base_class=1, categorical_columns=categorical)
 y_pred, y_energies = cls.predict(X_test, return_energies=True)
 
 #plot energies

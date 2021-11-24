@@ -24,7 +24,6 @@ def pair_freq(long [:, :] X_view,
     cdef int i, j, count, ai, aj, item, x
     cdef int n_inst = X_view.shape[0]
     cdef int n_attr = X_view.shape[1]
-
     pairfreq = np.zeros((n_attr, max_bin, n_attr, max_bin),
                         dtype='double')
 

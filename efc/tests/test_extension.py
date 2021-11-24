@@ -10,13 +10,22 @@ from efc import coupling
 from efc import local_fields
 from efc import pair_freq
 from efc import compute_energy
-from energyclassifier_pure_python import BaseEFC
+from _base_pure import BaseEFC
 import warnings
 
 
 @pytest.fixture
 def data():
     X, y = load_iris(return_X_y=True)
+    return X, y
+
+def test_extension(data):
+    X, y = data
+    X = X[np.where(y==0)[0]]
+    y = y[np.where(y==0)[0]]
+
+    #pure python version
+    clf = BaseEFC()
 
     #normalize features
     norm = MaxAbsScaler()
@@ -27,15 +36,8 @@ def data():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
         X = disc.fit_transform(X).astype('int')
-    return X, y
 
-def test_extension(data):
-    X, y = data
-    X = X[np.where(y==0)[0]]
-    y = y[np.where(y==0)[0]]
 
-    #pure python version
-    clf = BaseEFC()
     clf.fit(X)
 
     #extension methods

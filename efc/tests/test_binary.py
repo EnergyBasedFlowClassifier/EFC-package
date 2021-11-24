@@ -1,24 +1,12 @@
 import pytest
 import numpy as np
-import warnings 
 from sklearn.datasets import load_breast_cancer
-from sklearn.preprocessing import MaxAbsScaler, KBinsDiscretizer
 from sklearn.model_selection import train_test_split
 from efc import EnergyBasedFlowClassifier
 
 @pytest.fixture
 def data():
     X, y = load_breast_cancer(return_X_y=True)
-
-    #normalize features
-    norm = MaxAbsScaler()
-    X = norm.fit_transform(X)
-
-    #discretize features
-    disc = KBinsDiscretizer(n_bins=30, encode='ordinal', strategy='quantile')
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=UserWarning)
-        X = disc.fit_transform(X).astype('int')
     return X, y
 
 

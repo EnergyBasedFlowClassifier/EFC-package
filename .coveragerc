@@ -2,8 +2,8 @@
 
 [run]
 branch = True
-source = efctemplate
-include = */efctemplate/*
+source = efc
+include = */efc/*
 omit =
     */setup.py
 

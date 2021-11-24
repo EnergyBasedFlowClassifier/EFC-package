@@ -10,13 +10,6 @@ from efc import EnergyBasedFlowClassifier
     [EnergyBasedFlowClassifier()]
 )
 
-# @pytest.mark.skip(reason="test 20 impossible to pass")
+
 def test_all_estimators(estimator):
     return check_estimator(estimator)
-
-
-# for idx, (estimator, func) in enumerate(test_all_estimators(EnergyBasedFlowClassifier())):
-#     if idx not in []:
-#         print(idx)
-#         print(func)
-#         func(estimator)

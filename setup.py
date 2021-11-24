@@ -11,16 +11,14 @@ ver_file = os.path.join('efc', '_version.py')
 with open(ver_file) as f:
     exec(f.read())
 
-DISTNAME = 'efc-pkg'
+DISTNAME = 'efc'
 DESCRIPTION = 'A scikit-learn compatible package of the Energy-based Flow Classifier.'
 with codecs.open('README.rst', encoding='utf-8-sig') as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = 'Manuela M. C. de Souza'
 MAINTAINER_EMAIL = 'munak98@hotmail.com'
-URL = 'https://github.com/scikit-learn-contrib/project-template'
 LICENSE = 'new BSD'
-DOWNLOAD_URL = 'https://github.com/scikit-learn-contrib/project-template'
-VERSION = 1.0
+VERSION = __version__
 INSTALL_REQUIRES = ['numpy', 'scipy', 'scikit-learn']
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
@@ -55,16 +53,14 @@ setup(name=DISTNAME,
       maintainer_email=MAINTAINER_EMAIL,
       description=DESCRIPTION,
       license=LICENSE,
-      url=URL,
       version=VERSION,
-      download_url=DOWNLOAD_URL,
       long_description=LONG_DESCRIPTION,
       zip_safe=False,  # the package can run out of an .egg file
       classifiers=CLASSIFIERS,
       packages=find_packages(),
       install_requires=INSTALL_REQUIRES,
       extras_require=EXTRAS_REQUIRE,
-      ext_modules= cythonize("efc/_energyclassifier_fast.pyx")
+      ext_modules= cythonize("efc/_base_fast.pyx")
 
 )
 

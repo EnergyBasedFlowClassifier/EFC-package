@@ -9,16 +9,6 @@ from efc import EnergyBasedFlowClassifier
 @pytest.fixture
 def data():
     X, y = load_iris(return_X_y=True)
-
-    #normalize features
-    norm = MaxAbsScaler()
-    X = norm.fit_transform(X)
-
-    #discretize features
-    disc = KBinsDiscretizer(n_bins=30, encode='ordinal', strategy='quantile')
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=UserWarning)
-        X = disc.fit_transform(X).astype('int')
     return X, y
 
 def test_multiclass(data):
