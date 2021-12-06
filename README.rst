@@ -30,4 +30,7 @@ Use EFC like a scikit-learn estimator::
 It supports both binary and multiclass classification.
 When the target is binary, EFC is a single-class algorithm. Therefore, the user must choose which class will be used as the base class.
 When the target is multiclass, the user must choose whether to use the unknown label or not. 
+
+
+The EFC internally normalizes and discretizes the input data. However, like any scikit-learn estimator, it requires categorical features to be encoded before input. It is also necessary that categorical columns are specified when calling the fit method, so that they are ignored during attribute preprocessing.
 For a full explanation of each of the EFC parameters, read the documentation in ReadTheDocs.
