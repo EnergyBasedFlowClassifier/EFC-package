@@ -51,4 +51,12 @@ Citation
 
 If you use EFC in a scientific publication, please cite the original paper
 
-    C. F. T. Pontes, M. M. C. de Souza, J. J. C. Gondim, M. Bishop and M. A. Marotta, *"A New Method for Flow-Based Network Intrusion Detection Using the Inverse Potts Model,"* in *IEEE Transactions on Network and Service Management*, vol. 18, no. 2, pp. 1125-1136, June 2021, doi: 10.1109/TNSM.2021.3075503.
+    @article {9415676,
+      author={Pontes, Camila F. T. and de Souza, Manuela M. C. and Gondim, João J. C. and Bishop, Matt and Marotta, Marcelo Antonio},
+      journal={IEEE Transactions on Network and Service Management}, 
+      title={A New Method for Flow-Based Network Intrusion Detection Using the Inverse Potts Model}, 
+      year={2021},
+      volume={18},
+      number={2},
+      pages={1125-1136},
+      doi={10.1109/TNSM.2021.3075503}}
