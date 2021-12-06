@@ -33,5 +33,5 @@ When the target is multiclass, the user must choose whether to use the unknown l
 
 
 The EFC internally normalizes and discretizes the input data. However, like any scikit-learn estimator, it requires categorical features to be encoded before input. It is also necessary that categorical columns are specified when calling the fit method, so that they are ignored during attribute preprocessing.
-For a full explanation of each of EFC's parameters, read the `API documentation <https://efc-package.readthedocs.io/en/latest/generated/efc.EnergyBasedFlowClassifier.html#efc.EnergyBasedFlowClassifier>`_in Read the Docs.
+For a full explanation of each of EFC's parameters, read the `API documentation <https://efc-package.readthedocs.io/en/latest/generated/efc.EnergyBasedFlowClassifier.html#efc.EnergyBasedFlowClassifier>`_ in Read the Docs.
 
