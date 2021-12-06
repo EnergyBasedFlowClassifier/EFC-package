@@ -15,8 +15,6 @@ from sklearn.pipeline import Pipeline
 
 from joblib import Parallel, delayed
 
-from pandas.api.types import is_numeric_dtype
-
 from ._base import BaseEFC
 
 class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
@@ -213,7 +211,7 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
                 y_pred[row] = self.classes_[label_idx]
                 if unknown_class:
                     if min_energy > self.estimators_[label_idx].cutoff_:
-                        if is_numeric_dtype(self.classes_):
+                        if np.issubdtype(self.classes_.dtype, np.numeric):
                             y_pred[row] = -1
                         else:
                             y_pred[row] = "unknown"
