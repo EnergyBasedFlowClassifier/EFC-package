@@ -211,7 +211,7 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
                 y_pred[row] = self.classes_[label_idx]
                 if unknown_class:
                     if min_energy > self.estimators_[label_idx].cutoff_:
-                        if np.issubdtype(self.classes_.dtype, np.numeric):
+                        if np.issubdtype(self.classes_.dtype, np.number):
                             y_pred[row] = -1
                         else:
                             y_pred[row] = "unknown"
