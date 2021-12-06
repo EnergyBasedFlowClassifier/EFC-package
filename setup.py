@@ -19,7 +19,7 @@ MAINTAINER = 'Manuela M. C. de Souza'
 MAINTAINER_EMAIL = 'munak98@hotmail.com'
 LICENSE = 'new BSD'
 VERSION = __version__
-INSTALL_REQUIRES = ['numpy', 'scipy', 'scikit-learn']
+INSTALL_REQUIRES = ['numpy', 'cython', 'scikit-learn']
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',

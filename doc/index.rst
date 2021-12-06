@@ -3,11 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to efc-template's documentation!
-============================================
-
-This project is a reference implementation to anyone who wishes to develop
-scikit-learn compatible classes.
+Welcome to the Energy-based Flow Classifier's documentation!
+============================================================
 
 .. toctree::
    :maxdepth: 2
@@ -34,19 +31,19 @@ scikit-learn compatible classes.
 `Getting started <quick_start.html>`_
 -------------------------------------
 
-Information regarding this template and how to modify it for your own project.
+Information on installing this package.
 
 `User Guide <user_guide.html>`_
 -------------------------------
 
-An example of narrative documentation.
+Information on basic usage of this package.
 
 `API Documentation <api.html>`_
 -------------------------------
 
-An example of API documentation.
+Documentation of the class :class:`EnergyBasedFlowClassifier`.
 
 `Examples <auto_examples/index.html>`_
 --------------------------------------
 
-A set of examples. It complements the `User Guide <user_guide.html>`_.
+A set of examples that complements the `User Guide <user_guide.html>`_.

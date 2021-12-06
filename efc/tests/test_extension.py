@@ -8,6 +8,7 @@ from sklearn.preprocessing import MaxAbsScaler, KBinsDiscretizer
 
 from efc import coupling
 from efc import local_fields
+from efc import site_freq
 from efc import pair_freq
 from efc import compute_energy
 from _base_pure import BaseEFC
@@ -41,13 +42,15 @@ def test_extension(data):
     clf.fit(X)
 
     #extension methods
-    pairfreq = pair_freq(X, clf.sitefreq_, clf.pseudocounts, clf.max_bin)
+    sitefreq = site_freq(X, clf.pseudocounts, clf.max_bin)
+    pairfreq = pair_freq(X, sitefreq, clf.pseudocounts, clf.max_bin)
     coupling_matrix = coupling(pairfreq, clf.sitefreq_, clf.pseudocounts, clf.max_bin)
     fields = local_fields(coupling_matrix, pairfreq, clf.sitefreq_, clf.pseudocounts, clf.max_bin)
     coupling_matrix = np.log(coupling_matrix)
     fields = np.log(fields)
 
     # assert python version with extension
+    assert_array_equal(clf.sitefreq_, sitefreq)
     assert_array_equal(clf.pairfreq_, pairfreq)
     assert_array_equal(clf.coupling_matrix_, coupling_matrix)
     assert_array_equal(clf.local_fields_, fields)

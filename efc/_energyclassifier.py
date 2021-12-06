@@ -1,10 +1,8 @@
 """
-This is a module that implements the Energy-based Flow Classifier.
+This is a module that implements the Energy-based Flow Classifier main interface.
 """
 import numpy as np
 import warnings
-import pandas as pd
-from pandas.core.arrays import categorical
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.validation import check_X_y
@@ -30,9 +28,13 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
         The weight of the pseudocounts added to empirical
         frequencies. Must be in the interval `(0,1)`.
 
-    cutoff_quantile : float, default=`0.95`s
+    cutoff_quantile : float, default=`0.95`
         The quantile used to define the model's energy threshold.
         It must be in range `(0,1)`.
+
+    n_bins : int, default=`30`
+        The number of bins to produce when discretizing data features. Using 
+        the quantile strategy.
 
     n_jobs : int, default=None
         The number of parallel jobs to run on :meth:`fit`
@@ -52,12 +54,12 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
         The classes seen at :meth:`fit`.
 
     target_type_ : string
-        The type of target seen at :meth:`fit`. Return according to
+        The type of target seen at :meth:`fit` according to
         :meth:`utils.multiclass.type_of_target`.
 
     base_class_idx_ : int
-        Only used when target is binary. The index of the base class passed to 
-        :meth:`fit` in the classes_ vector.
+        The index of the base class passed to 
+        :meth:`fit` in the classes_ vector. Only used when target is binary.
 
     estimators_ : list of BaseEFC instances
         The collection of fitted sub-estimators. When the target
@@ -66,15 +68,14 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
 
     """
 
-    def __init__(self, pseudocounts=0.5, cutoff_quantile=0.95, disc_quantile=30, n_jobs=None):
+    def __init__(self, pseudocounts=0.5, cutoff_quantile=0.95, n_bins=30, n_jobs=None):
         self.pseudocounts = pseudocounts
         self.cutoff_quantile = cutoff_quantile
-        self.disc_quantile = disc_quantile
+        self.n_bins = n_bins
         self.n_jobs = n_jobs
 
     def _more_tags(self):
         return {'poor_score': True}
-
 
     def fit(self, X, y, base_class=None, categorical_columns=[]):
         """Fit the Energy-based Flow Classifier model according to X.
@@ -90,6 +91,8 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
         base_class : int or string, depending on y's dtype
             Only used for binary target. Defines the class that will be used for training among the classes in the target vector. If no class is passed, the first class in the array np.unique(y) will be used.
 
+        categorical_columns : array-like 
+            Indicates categorical attributes so that they are not normalized and discretized as numeric attributes. These attributes must be encoded before being passed to EFC.
 
         Returns
         -------
@@ -103,7 +106,7 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
 
         numeric_transformer = Pipeline(
             steps=[("scaler", MaxAbsScaler()), 
-                    ("discretizer", KBinsDiscretizer(n_bins=self.disc_quantile, encode='ordinal', strategy='quantile'))]
+                    ("discretizer", KBinsDiscretizer(n_bins=self.n_bins, encode='ordinal', strategy='quantile'))]
                 )
 
         self.preprocessor_ = ColumnTransformer(
@@ -116,7 +119,6 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
             warnings.simplefilter("ignore", category=UserWarning)
             X = self.preprocessor_.fit_transform(X).astype("int64")
         
-
 
         self.max_bin_ = np.max(X) + 1
         self.n_features_in_ = X.shape[1]
@@ -160,6 +162,10 @@ class EnergyBasedFlowClassifier(ClassifierMixin, BaseEstimator):
 
         return_energies : boolean, default=False,
             Whether to return the energy vector of samples in X.
+
+        unknown_class : boolean, default=False,
+            Whether to use the `unknown` class for samples with low similarity to all training classes. If targets dtype is numeric, the unknown class will be represented by -1.
+
 
         Returns
         -------

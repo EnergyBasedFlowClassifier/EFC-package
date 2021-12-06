@@ -1,18 +1,22 @@
 """
-This is a module that implements the Energy-based Flow Classifier.
+This is a module that implements the Energy-based Flow Classifier base estimator.
 """
 import numpy as np
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 
+from ._base_fast import site_freq
+from ._base_fast import pair_freq
 from ._base_fast import coupling
 from ._base_fast import local_fields
-from ._base_fast import pair_freq
 from ._base_fast import compute_energy
 
 
 class BaseEFC(ClassifierMixin, BaseEstimator):
-    """ The Base estimator used by the Energy-based Flow Classifier.
+    """ The Base estimator used by the EnergyBasedFlowClassifier estimator.
+
+    Note:
+        This class must not be instantiated by end users.
 
     Parameters
     ----------
@@ -28,8 +32,12 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
 
     Attributes
     ----------
+
+    X_ : ndarray, (n_samples, n_features)
+        The training set.
+
     sitefreq_ : ndarray, shape (n_feature, max_bin)
-      Observed frequency of attribute values ​​in each attribute.
+        Observed frequency of attribute values ​​in each attribute.
 
     pairfreq_ : ndarray, shape (n_feature, max_bin, n_feature, max_bin)
         Observed frequency of attribute value pairs in attribute pairs.
@@ -44,12 +52,14 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
 
     """
 
-    def __init__(self, max_bin=30, pseudocounts=0.5, cutoff_quantile=0.99):
+    def __init__(self, max_bin=30, pseudocounts=0.5, cutoff_quantile=0.95):
         self.max_bin = max_bin
         self.pseudocounts = pseudocounts
         self.cutoff_quantile = cutoff_quantile
 
-    """Fit the Base estimator for the Energy-based Flow Classifier model according to the given training data.
+    """
+    
+    Fit the Base estimator for the EnergyBasedFlowClassifier model according to the given training data.
 
     Parameters
     ----------
@@ -74,17 +84,7 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
         return self
 
     def _site_freq(self):
-        n_attr = self.X_.shape[1]
-        sitefreq = np.empty((n_attr, self.max_bin), dtype='float')
-        for i in range(n_attr):
-            for aa in range(self.max_bin):
-                sitefreq[i, aa] = np.sum(np.equal(self.X_[:, i], aa))
-
-        sitefreq /= self.X_.shape[0]
-        sitefreq = ((1 - self.pseudocounts) * sitefreq
-                    + self.pseudocounts / self.max_bin)
-
-        return sitefreq
+        return site_freq(self.X_, self.pseudocounts, self.max_bin)
 
     def _pair_freq(self):
         return pair_freq(self.X_, self.sitefreq_, self.pseudocounts, self.max_bin)

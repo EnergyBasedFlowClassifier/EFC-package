@@ -1,5 +1,0 @@
-name: efc
-dependencies:
-  - numpy
-  - scipy
-  - scikit-learn

@@ -16,6 +16,26 @@ cdef cantor(long [:] x, long [:] y):
         output_view[i] = (x[i] + y[i]) * (x[i] + y[i] + 1) / 2 + y[i]
     return output
 
+def site_freq(long [:, :] X_view,
+            double psdcounts,
+            int max_bin):
+            
+    cdef int n_attr = X_view.shape[1]
+    sitefreq = np.zeros((n_attr, max_bin), dtype='double')
+    
+    cdef double [:, :] sitefreq_view = sitefreq
+
+    for i in range(n_attr):
+        for aa in range(max_bin):
+            sitefreq_view[i, aa] = np.sum(np.equal(X_view[:, i], aa))
+
+    sitefreq /= X_view.shape[0]
+    sitefreq = ((1 - psdcounts) * sitefreq
+                + psdcounts / max_bin)
+
+    return sitefreq
+
+
 # @cython.cdivision(True)
 def pair_freq(long [:, :] X_view,
             double [:, :] sitefreq_view,
