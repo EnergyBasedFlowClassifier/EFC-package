@@ -12,9 +12,9 @@ Installation
 
 Currently, the only way to install EFC is from source, using its GitHub repository. To do so, clone this repository and run the command ``pip install .`` inside the root folder::
 
-    >>> git clone https://github.com/EnergyBasedFlowClassifier/EFC-package
-    ... cd EFC-package
-    ... pip install .
+    git clone https://github.com/EnergyBasedFlowClassifier/EFC-package
+    cd EFC-package
+    pip install .
 
 
 Usage
