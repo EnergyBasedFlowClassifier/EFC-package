@@ -10,10 +10,11 @@ The Energy-Based Flow Classifier (EFC) is a new classification method developed 
 Installation
 ------------
 
-Currently, the only way to install EFC is from source, using its GitHub repository. To do so, clone this repository and run the command ``pip install .`` inside the root folder::
+Currently, the only way to install EFC is from source, using its GitHub repository. To do so, clone this repository and run the following commands::
 
     git clone https://github.com/EnergyBasedFlowClassifier/EFC-package
     cd EFC-package
+    pip install -r requirements.txt
     pip install .
 
 

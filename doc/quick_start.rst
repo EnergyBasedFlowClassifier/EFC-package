@@ -12,4 +12,5 @@ Currently, EFC can only be installed from source via its github repository::
     
     >>> git clone https://github.com/EnergyBasedFlowClassifier/EFC-package
     ... cd EFC-package
+    ... pip install -r requirements.txt
     ... pip install .
