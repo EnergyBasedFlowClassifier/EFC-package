@@ -49,4 +49,14 @@ For a full explanation of each of EFC's parameters, read the `API documentation 
 Citation
 --------
 
-If you use EFC in a scientific publication, please cite:
+If you use EFC in a scientific publication, please cite the original paper
+
+    @article {9415676,
+      author={Pontes, Camila F. T. and de Souza, Manuela M. C. and Gondim, João J. C. and Bishop, Matt and Marotta, Marcelo Antonio},
+      journal={IEEE Transactions on Network and Service Management}, 
+      title={A New Method for Flow-Based Network Intrusion Detection Using the Inverse Potts Model}, 
+      year={2021},
+      volume={18},
+      number={2},
+      pages={1125-1136},
+      doi={10.1109/TNSM.2021.3075503}}
