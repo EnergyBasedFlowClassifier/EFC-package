@@ -4,8 +4,9 @@ This is a module that implements the Energy-based Flow Classifier.
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
+
 class BaseEFC(ClassifierMixin, BaseEstimator):
-    """ The Base estimator used by the Energy-based Flow Classifier.
+    """The Base estimator used by the Energy-based Flow Classifier.
 
     Parameters
     ----------
@@ -68,14 +69,13 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
 
     def _site_freq(self):
         n_attr = self.X_.shape[1]
-        sitefreq = np.empty((n_attr, self.max_bin), dtype='double')
+        sitefreq = np.empty((n_attr, self.max_bin), dtype="double")
         for i in range(n_attr):
             for aa in range(self.max_bin):
                 sitefreq[i, aa] = np.sum(np.equal(self.X_[:, i], aa))
 
         sitefreq /= self.X_.shape[0]
-        sitefreq = ((1 - self.pseudocounts) * sitefreq
-                    + self.pseudocounts / self.max_bin)
+        sitefreq = (1 - self.pseudocounts) * sitefreq + self.pseudocounts / self.max_bin
 
         return sitefreq
 
@@ -85,64 +85,75 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
     def _pair_freq(self):
         n_inst = self.X_.shape[0]
         n_attr = self.X_.shape[1]
-        pairfreq = np.zeros((n_attr, self.max_bin, n_attr, self.max_bin),
-                            dtype='double')
+        pairfreq = np.zeros(
+            (n_attr, self.max_bin, n_attr, self.max_bin), dtype="double"
+        )
 
-        
         for i in range(n_attr):
             for j in range(n_attr):
-                c = self._cantor(self.X_[:,i],self.X_[:,j])
-                unique,aaIdx = np.unique(c,True)
+                c = self._cantor(self.X_[:, i], self.X_[:, j])
+                unique, aaIdx = np.unique(c, True)
                 for x, item in enumerate(unique):
-                    pairfreq[i, self.X_[aaIdx[x],i],j,self.X_[aaIdx[x],j]] = np.sum(np.equal(c,item))
+                    pairfreq[i, self.X_[aaIdx[x], i], j, self.X_[aaIdx[x], j]] = np.sum(
+                        np.equal(c, item)
+                    )
 
         pairfreq /= n_inst
-        pairfreq = (1-self.pseudocounts)*pairfreq + self.pseudocounts/(self.max_bin**2)
+        pairfreq = (1 - self.pseudocounts) * pairfreq + self.pseudocounts / (
+            self.max_bin ** 2
+        )
 
         for i in range(n_attr):
             for ai in range(self.max_bin):
                 for aj in range(self.max_bin):
-                    if (ai==aj):
-                        pairfreq[i,ai,i,aj] = self.sitefreq_[i,ai]
+                    if ai == aj:
+                        pairfreq[i, ai, i, aj] = self.sitefreq_[i, ai]
                     else:
-                        pairfreq[i,ai,i,aj] = 0.0
+                        pairfreq[i, ai, i, aj] = 0.0
         return pairfreq
-
 
     def _coupling(self):
         n_attr = self.sitefreq_.shape[0]
-        corr_matrix = np.empty((n_attr * (self.max_bin - 1),
-                                n_attr * (self.max_bin - 1)), dtype='double')
+        corr_matrix = np.empty(
+            (n_attr * (self.max_bin - 1), n_attr * (self.max_bin - 1)), dtype="double"
+        )
         for i in range(n_attr):
             for j in range(n_attr):
                 for ai in range(self.max_bin - 1):
                     for aj in range(self.max_bin - 1):
-                        corr_matrix[i * (self.max_bin - 1) + ai,
-                                    j * (self.max_bin - 1) + aj] = (self.pairfreq_[i, ai, j, aj]
-                                                                    - self.sitefreq_[i, ai]
-                                                                    * self.sitefreq_[j, aj])
+                        corr_matrix[
+                            i * (self.max_bin - 1) + ai, j * (self.max_bin - 1) + aj
+                        ] = (
+                            self.pairfreq_[i, ai, j, aj]
+                            - self.sitefreq_[i, ai] * self.sitefreq_[j, aj]
+                        )
 
         inv_corr = np.linalg.inv(corr_matrix)
         return np.exp(np.negative(inv_corr))
 
     def _local_fields(self):
         n_inst = self.sitefreq_.shape[0]
-        fields = np.empty((n_inst * (self.max_bin - 1)), dtype='double')
+        fields = np.empty((n_inst * (self.max_bin - 1)), dtype="double")
 
         for i in range(n_inst):
             for ai in range(self.max_bin - 1):
-                fields[i * (self.max_bin - 1) + ai] = (self.sitefreq_[i, ai]
-                                                       / self.sitefreq_[i, self.max_bin - 1])
+                fields[i * (self.max_bin - 1) + ai] = (
+                    self.sitefreq_[i, ai] / self.sitefreq_[i, self.max_bin - 1]
+                )
                 for j in range(n_inst):
                     for aj in range(self.max_bin - 1):
                         fields[i * (self.max_bin - 1) + ai] /= (
-                            self.coupling_matrix_[i * (self.max_bin - 1) + ai, j * (self.max_bin - 1) + aj]**self.sitefreq_[j, aj])
+                            self.coupling_matrix_[
+                                i * (self.max_bin - 1) + ai, j * (self.max_bin - 1) + aj
+                            ]
+                            ** self.sitefreq_[j, aj]
+                        )
 
         return fields
 
     def _compute_energy(self, X):
         n_inst, n_attr = X.shape[0], X.shape[1]
-        energies = np.empty(n_inst, dtype='double')
+        energies = np.empty(n_inst, dtype="double")
         for i in range(n_inst):
             e = 0
             for j in range(n_attr - 1):
@@ -151,9 +162,11 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
                     for k in range(j, n_attr):
                         k_value = X[i, k]
                         if k_value != (self.max_bin - 1):
-                            e -= (self.coupling_matrix_[j * (self.max_bin - 1)
-                                                        + j_value, k * (self.max_bin - 1) + k_value])
-                    e -= (self.local_fields_[j * (self.max_bin - 1) + j_value])
+                            e -= self.coupling_matrix_[
+                                j * (self.max_bin - 1) + j_value,
+                                k * (self.max_bin - 1) + k_value,
+                            ]
+                    e -= self.local_fields_[j * (self.max_bin - 1) + j_value]
             energies[i] = e
         return energies
 

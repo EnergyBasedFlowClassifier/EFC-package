@@ -8,7 +8,7 @@ cimport cython
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef cantor(long [:] x, long [:] y):
+cdef cantor(long long [:] x, long long [:] y):
     output = np.empty(x.shape[0], dtype='double')
     cdef double [:] output_view = output
     cdef int i 
@@ -16,7 +16,7 @@ cdef cantor(long [:] x, long [:] y):
         output_view[i] = (x[i] + y[i]) * (x[i] + y[i] + 1) / 2 + y[i]
     return output
 
-def site_freq(long [:, :] X_view,
+def site_freq(long long [:, :] X_view,
             double psdcounts,
             int max_bin):
             
@@ -37,7 +37,7 @@ def site_freq(long [:, :] X_view,
 
 
 # @cython.cdivision(True)
-def pair_freq(long [:, :] X_view,
+def pair_freq(long long [:, :] X_view,
             double [:, :] sitefreq_view,
             double psdcounts,
             int max_bin):
@@ -128,7 +128,7 @@ def compute_energy(self, X):
 
     energies = np.empty(n_inst, dtype='double')
 
-    cdef long [:, :] X_view = X
+    cdef long long [:, :] X_view = X
     cdef double [:] energies_view = energies
     cdef double [:, :] coupling_view = self.coupling_matrix_
     cdef double [:] fields_view = self.local_fields_

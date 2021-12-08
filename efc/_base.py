@@ -13,7 +13,7 @@ from ._base_fast import compute_energy
 
 
 class BaseEFC(ClassifierMixin, BaseEstimator):
-    """ The Base estimator used by the EnergyBasedFlowClassifier estimator.
+    """The Base estimator used by the EnergyBasedFlowClassifier estimator.
 
     Note:
         This class must not be instantiated by end users.
@@ -93,7 +93,13 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
         return coupling(self.pairfreq_, self.sitefreq_, self.pseudocounts, self.max_bin)
 
     def _local_fields(self):
-        return local_fields(self.coupling_matrix_, self.pairfreq_, self.sitefreq_, self.pseudocounts, self.max_bin)
+        return local_fields(
+            self.coupling_matrix_,
+            self.pairfreq_,
+            self.sitefreq_,
+            self.pseudocounts,
+            self.max_bin,
+        )
 
     def _compute_energy(self, X):
         return compute_energy(self, X)

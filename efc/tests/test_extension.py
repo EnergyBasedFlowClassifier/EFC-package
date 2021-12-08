@@ -20,32 +20,34 @@ def data():
     X, y = load_iris(return_X_y=True)
     return X, y
 
+
 def test_extension(data):
     X, y = data
-    X = X[np.where(y==0)[0]]
-    y = y[np.where(y==0)[0]]
+    X = X[np.where(y == 0)[0]]
+    y = y[np.where(y == 0)[0]]
 
-    #pure python version
+    # pure python version
     clf = BaseEFC()
 
-    #normalize features
+    # normalize features
     norm = MaxAbsScaler()
     X = norm.fit_transform(X)
 
-    #discretize features
-    disc = KBinsDiscretizer(n_bins=30, encode='ordinal', strategy='quantile')
+    # discretize features
+    disc = KBinsDiscretizer(n_bins=30, encode="ordinal", strategy="quantile")
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
-        X = disc.fit_transform(X).astype('int')
-
+        X = disc.fit_transform(X).astype("int")
 
     clf.fit(X)
 
-    #extension methods
+    # extension methods
     sitefreq = site_freq(X, clf.pseudocounts, clf.max_bin)
     pairfreq = pair_freq(X, sitefreq, clf.pseudocounts, clf.max_bin)
     coupling_matrix = coupling(pairfreq, clf.sitefreq_, clf.pseudocounts, clf.max_bin)
-    fields = local_fields(coupling_matrix, pairfreq, clf.sitefreq_, clf.pseudocounts, clf.max_bin)
+    fields = local_fields(
+        coupling_matrix, pairfreq, clf.sitefreq_, clf.pseudocounts, clf.max_bin
+    )
     coupling_matrix = np.log(coupling_matrix)
     fields = np.log(fields)
 
@@ -55,4 +57,3 @@ def test_extension(data):
     assert_array_equal(clf.coupling_matrix_, coupling_matrix)
     assert_array_equal(clf.local_fields_, fields)
     assert_array_equal(clf._compute_energy(X), compute_energy(clf, X))
-
