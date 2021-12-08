@@ -3,7 +3,7 @@ Energy-based Flow Classifier
 ============================
 
 The Energy-Based Flow Classifier (EFC) is a new classification method developed in the context of network intrusion detection systems. It was first presented in
-`A New Method for Flow-Based Network Intrusion Detection Using the Inverse Potts Model <https://ieeexplore.ieee.org/document/9415676>`_. `Abnormal Behavior Detection Based on Traffic Pattern Categorization in Mobile Cellular Networks <https://ieeexplore.ieee.org/document/9600445>`_.
+`A New Method for Flow-Based Network Intrusion Detection Using the Inverse Potts Model <https://ieeexplore.ieee.org/document/9415676>`_.
 
 Dependencies
 ------------
