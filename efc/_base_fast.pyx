@@ -146,3 +146,36 @@ def compute_energy(self, X):
                 e -= (fields_view[j * (max_bin - 1) + j_value])
         energies_view[i] = e
     return energies
+
+
+def breakdown_energy(self, x):
+    cdef int n_attr = x.shape[1]
+    cdef int j, k, j_value, k_value
+    cdef double e, holder
+    cdef int max_bin = self.max_bin
+
+    cdef double [:, :] coupling_view = self.coupling_matrix_
+    cdef double [:] fields_view = self.local_fields_
+
+    sample_couplings = np.zeros((n_attr, n_attr), dtype='double')
+    sample_fields = np.zeros(n_attr, dtype='double')
+
+
+    e = 0
+    for j in range(n_attr - 1):
+        j_value = x[0, j]
+        if j_value != (max_bin - 1):
+            for k in range(j, n_attr):
+                k_value = x[0, k]
+                if k_value != (max_bin - 1):
+                    holder = (coupling_view[j * (max_bin - 1)
+                                                + j_value, k * (max_bin - 1) + k_value])
+                    sample_couplings[j, k] = holder
+                    sample_couplings[k, j] = holder
+                    e -= holder
+                    
+                holder = (fields_view[j * (max_bin - 1) + j_value])
+                e -= holder
+                sample_fields[j] = holder
+
+    return e, sample_fields, sample_couplings

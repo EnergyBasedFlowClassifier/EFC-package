@@ -10,6 +10,7 @@ from ._base_fast import pair_freq
 from ._base_fast import coupling
 from ._base_fast import local_fields
 from ._base_fast import compute_energy
+from ._base_fast import breakdown_energy
 
 
 class BaseEFC(ClassifierMixin, BaseEstimator):
@@ -104,7 +105,11 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
     def _compute_energy(self, X):
         return compute_energy(self, X)
 
+    def _breakdown_energy(self, x):
+        return breakdown_energy(self, x)
+
     def _define_cutoff(self):
         energies = compute_energy(self, self.X_)
         energies = np.sort(energies, axis=None)
         return energies[int(energies.shape[0] * self.cutoff_quantile)]
+
