@@ -156,10 +156,10 @@ class BaseEFC(ClassifierMixin, BaseEstimator):
         energies = np.empty(n_inst, dtype="double")
         for i in range(n_inst):
             e = 0
-            for j in range(n_attr - 1):
+            for j in range(n_attr):
                 j_value = X[i, j]
                 if j_value != (self.max_bin - 1):
-                    for k in range(j, n_attr):
+                    for k in range(j+1, n_attr):
                         k_value = X[i, k]
                         if k_value != (self.max_bin - 1):
                             e -= self.coupling_matrix_[
