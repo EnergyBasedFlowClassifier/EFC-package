@@ -138,12 +138,14 @@ def compute_energy(self, X):
         for j in range(n_attr):
             j_value = X_view[i, j]
             if j_value != (max_bin - 1):
-                for k in range(j+1, n_attr):
+                for k in range(j, n_attr):
                     k_value = X_view[i, k]
                     if k_value != (max_bin - 1):
                         e -= (coupling_view[j * (max_bin - 1)
                                                     + j_value, k * (max_bin - 1) + k_value])
                 e -= (fields_view[j * (max_bin - 1) + j_value])
+
+
         energies_view[i] = e
     return energies
 
@@ -162,7 +164,7 @@ def breakdown_energy(self, x):
 
 
     e = 0
-    for j in range(n_attr - 1):
+    for j in range(n_attr):
         j_value = x[0, j]
         if j_value != (max_bin - 1):
             for k in range(j, n_attr):
