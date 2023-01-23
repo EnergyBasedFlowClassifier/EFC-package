@@ -176,8 +176,8 @@ def breakdown_energy(self, x):
                     sample_couplings[k, j] = holder
                     e -= holder
                     
-                holder = (fields_view[j * (max_bin - 1) + j_value])
-                e -= holder
-                sample_fields[j] = holder
+            holder = (fields_view[j * (max_bin - 1) + j_value])
+            e -= holder
+            sample_fields[j] = holder
 
     return e, sample_fields, sample_couplings
