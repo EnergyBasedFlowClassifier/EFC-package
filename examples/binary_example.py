@@ -1,11 +1,11 @@
 """
-=========================================
-Plotting the Energy-based Flow Classifier
-=========================================
+================================================================
+Energy-based Flow Classifier for anomaly detection
+================================================================
 
 An example plot of the energies calculated by the :class:`EnergyBasedFlowClassfifier` for benign and malicious samples of cancer patients.
 
-In this example the EFC is trained with binary targets.
+In this example the EFC is trained only with the bening class, making it an anomaly detector
 
 """
 
@@ -28,6 +28,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # train and test EFC
 clf = EnergyBasedFlowClassifier(n_bins=10, cutoff_quantile=0.99)
+
+# Since the target for this dataset is binary, 
+# EFC will be used in its single-class version.
+# Therefore, we need to define which class will
+# be used for training with the parameter base_class=0
 clf.fit(X_train, y_train, base_class=0)
 y_pred, y_energies = clf.predict(X_test, return_energies=True)
 
@@ -67,3 +72,7 @@ plt.xlabel("Energy", fontsize=12)
 plt.ylabel("Density", fontsize=12)
 
 plt.show()
+
+
+
+
